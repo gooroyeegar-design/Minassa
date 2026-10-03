@@ -39,7 +39,15 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-data class ScanResult(val type:String,val title:String,val confidence:Int,val summary:String,val fields:List<Pair<String,String>>=emptyList(),val nextSteps:List<String> = emptyList(),val sources:List<Source> = emptyList())
+data class ScanResult(
+    val type: String,
+    val title: String,
+    val confidence: Int,
+    val summary: String,
+    val fields: List<Pair<String, String>> = emptyList(),
+    val nextSteps: List<String> = emptyList(),
+    val sources: List<Source> = emptyList()
+)
 data class Source(val name:String,val url:String,val note:String)
 data class HistoryItem(val title:String,val type:String,val time:String)
 
