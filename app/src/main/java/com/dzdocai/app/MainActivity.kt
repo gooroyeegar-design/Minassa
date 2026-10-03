@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -56,6 +57,7 @@ private val dgi=Source("General Directorate of Taxes","https://www.mfdgi.gov.dz/
 private val cnrc=Source("CNRC / Ministry of Commerce","https://commerce.gov.dz/fr/portail-du-cnrc","Business and commercial-register information")
 private val dzair=Source("Dzair Digital Services","https://services.interieur.gov.dz/","National digital-service entry point; availability can change")
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DZGuideApp() {
     var query by remember { mutableStateOf("") }
