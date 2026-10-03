@@ -27,7 +27,6 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.label.ImageLabeling
 import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
 import com.google.mlkit.vision.text.TextRecognition
-import com.google.mlkit.vision.text.arabic.ArabicTextRecognizerOptions
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import java.util.concurrent.Executors
 
@@ -146,7 +145,6 @@ private fun ScannerView(onResult:(ScanResult)->Unit){
     val previewView=remember{PreviewView(context)}
     val executor=remember{Executors.newSingleThreadExecutor()}
     val latin=remember{TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)}
-    val arabic=remember{TextRecognition.getClient(ArabicTextRecognizerOptions.Builder().build())}
     val barcode=remember{BarcodeScanning.getClient()}
     val labeler=remember{ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)}
     var lastText by remember{mutableStateOf("")}
@@ -161,17 +159,15 @@ private fun ScannerView(onResult:(ScanResult)->Unit){
                 if(media==null){proxy.close();return@setAnalyzer}
                 val image=InputImage.fromMediaImage(media,proxy.imageInfo.rotationDegrees)
                 latin.process(image).addOnSuccessListener{latinText->
-                    arabic.process(image).addOnSuccessListener{arabicText->
-                        val combined=(latinText.text+" "+arabicText.text).trim()
-                        if(combined.length>=8 && combined!=lastText){lastText=combined;onResult(DemoEngine.answer(combined.take(1600)))}
-                    }
+                    val combined=latinText.text.trim()
+                    if(combined.length>=8 && combined!=lastText){lastText=combined;onResult(DemoEngine.answer(combined.take(1600)))}
                 }
                 barcode.process(image).addOnSuccessListener{codes->if(codes.isNotEmpty())onResult(DemoEngine.answer("barcode "+(codes.first().rawValue?:"")))}
                 labeler.process(image).addOnSuccessListener{labels->labels.firstOrNull{it.confidence>=0.85f}?.let{if(lastText.isBlank())onResult(DemoEngine.answer(it.text))}}.addOnCompleteListener{proxy.close()}
             }
             try{provider.unbindAll();provider.bindToLifecycle(owner,CameraSelector.DEFAULT_BACK_CAMERA,preview,analysis)}catch(_:Exception){}
         },ContextCompat.getMainExecutor(context))
-        onDispose{executor.shutdown();latin.close();arabic.close();barcode.close();labeler.close()}
+        onDispose{executor.shutdown();latin.close();barcode.close();labeler.close()}
     }
     AndroidView({previewView},Modifier.fillMaxWidth().height(380.dp))
 }
